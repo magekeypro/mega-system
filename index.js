@@ -4,14 +4,14 @@ const { MongoClient } = require('mongodb');
 const app = express();
 app.use(express.json());
 
-// 🔥 حط الرابط هنا (مهم)
+// 🔗 حط رابط MongoDB هنا
 const uri = "mongodb+srv://galaxymaneg_db_user:5tLXk3DR8VHrH2RL@mega.s42tt5h.mongodb.net/?retryWrites=true&w=majority";
 
 const client = new MongoClient(uri);
 
 let db;
 
-// connect to database
+// اتصال بالداتابيز
 async function connectDB() {
   try {
     await client.connect();
@@ -29,7 +29,7 @@ app.get('/', (req, res) => {
   res.send('MEGA API + DB WORKING 🚀');
 });
 
-// جلب العملاء
+// 📥 جلب كل العملاء
 app.get('/clients', async (req, res) => {
   try {
     const clients = await db.collection("clients").find().toArray();
@@ -39,7 +39,21 @@ app.get('/clients', async (req, res) => {
   }
 });
 
-// إضافة عميل
+// ⚡ إضافة عميل بسرعة (من المتصفح)
+app.get('/add-client', async (req, res) => {
+  try {
+    await db.collection("clients").insertOne({
+      name: "Ahmed",
+      phone: "01000000000",
+      status: "active"
+    });
+    res.send("Client added 🚀");
+  } catch (err) {
+    res.status(500).send("Error adding client");
+  }
+});
+
+// 🧠 إضافة عميل بشكل احترافي (POST)
 app.post('/add-client', async (req, res) => {
   try {
     const clientData = req.body;
