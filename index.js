@@ -1,27 +1,41 @@
 const express = require('express');
-const app = express();
+const { MongoClient } = require('mongodb');
 
+const app = express();
 app.use(express.json());
 
-// test route
+// 🔗 حط هنا الرابط بتاعك
+const uri = "PUT_YOUR_MONGODB_URL_HERE";
+
+const client = new MongoClient(uri);
+
+let db;
+
+// connect to database
+async function connectDB() {
+  await client.connect();
+  db = client.db("mega");
+  console.log("Connected to MongoDB 🚀");
+}
+
+connectDB();
+
+// test
 app.get('/', (req, res) => {
-  res.send('MEGA API WORKING 🚀');
+  res.send('MEGA API + DB WORKING 🚀');
 });
 
 // get clients
-app.get('/clients', (req, res) => {
-  res.json([
-    { name: "Ahmed", phone: "0100000000", status: "active" }
-  ]);
+app.get('/clients', async (req, res) => {
+  const clients = await db.collection("clients").find().toArray();
+  res.json(clients);
 });
 
 // add client
-app.post('/clients', (req, res) => {
+app.post('/clients', async (req, res) => {
   const data = req.body;
-  res.json({
-    message: "Client added",
-    data: data
-  });
+  await db.collection("clients").insertOne(data);
+  res.json({ message: "Client saved ✅" });
 });
 
 app.listen(3000, () => {
