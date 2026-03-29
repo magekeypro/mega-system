@@ -1,5 +1,5 @@
 const express = require('express');
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
 
 const app = express();
 app.use(express.json());
@@ -11,7 +11,7 @@ const client = new MongoClient(uri);
 
 let db;
 
-// اتصال بالداتابيز
+// الاتصال بالداتابيز
 async function connectDB() {
   try {
     await client.connect();
@@ -29,7 +29,7 @@ app.get('/', (req, res) => {
   res.send('MEGA API + DB WORKING 🚀');
 });
 
-// 📥 جلب كل العملاء
+// 📥 عرض كل العملاء
 app.get('/clients', async (req, res) => {
   try {
     const clients = await db.collection("clients").find().toArray();
@@ -53,7 +53,7 @@ app.get('/add-client', async (req, res) => {
   }
 });
 
-// 🧠 إضافة عميل بشكل احترافي (POST)
+// 🧠 إضافة عميل (POST احترافي)
 app.post('/add-client', async (req, res) => {
   try {
     const clientData = req.body;
@@ -61,6 +61,38 @@ app.post('/add-client', async (req, res) => {
     res.send("Client added 🚀");
   } catch (err) {
     res.status(500).send("Error adding client");
+  }
+});
+
+// 🗑️ حذف عميل
+app.delete('/delete-client/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    await db.collection("clients").deleteOne({
+      _id: new ObjectId(id)
+    });
+
+    res.send("Client deleted 🗑️");
+  } catch (err) {
+    res.status(500).send("Error deleting client");
+  }
+});
+
+// ✏️ تعديل عميل
+app.put('/update-client/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    const newData = req.body;
+
+    await db.collection("clients").updateOne(
+      { _id: new ObjectId(id) },
+      { $set: newData }
+    );
+
+    res.send("Client updated ✏️");
+  } catch (err) {
+    res.status(500).send("Error updating client");
   }
 });
 
