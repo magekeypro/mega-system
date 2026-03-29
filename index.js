@@ -4,39 +4,54 @@ const { MongoClient } = require('mongodb');
 const app = express();
 app.use(express.json());
 
-// 🔗 حط هنا الرابط بتاعك
+// 🔥 حط الرابط هنا (مهم)
 const uri = "mongodb+srv://galaxymaneg_db_user:5tLXk3DR8VHrH2RL@mega.s42tt5h.mongodb.net/?retryWrites=true&w=majority";
+
 const client = new MongoClient(uri);
 
 let db;
 
 // connect to database
 async function connectDB() {
-  await client.connect();
-  db = client.db("mega");
-  console.log("Connected to MongoDB 🚀");
+  try {
+    await client.connect();
+    db = client.db("mega");
+    console.log("Connected to MongoDB 🚀");
+  } catch (err) {
+    console.error("DB Error:", err);
+  }
 }
 
 connectDB();
 
-// test
+// الصفحة الرئيسية
 app.get('/', (req, res) => {
   res.send('MEGA API + DB WORKING 🚀');
 });
 
-// get clients
+// جلب العملاء
 app.get('/clients', async (req, res) => {
-  const clients = await db.collection("clients").find().toArray();
-  res.json(clients);
+  try {
+    const clients = await db.collection("clients").find().toArray();
+    res.json(clients);
+  } catch (err) {
+    res.status(500).send("Error fetching clients");
+  }
 });
 
-// add client
-app.post('/clients', async (req, res) => {
-  const data = req.body;
-  await db.collection("clients").insertOne(data);
-  res.json({ message: "Client saved ✅" });
+// إضافة عميل
+app.post('/add-client', async (req, res) => {
+  try {
+    const clientData = req.body;
+    await db.collection("clients").insertOne(clientData);
+    res.send("Client added 🚀");
+  } catch (err) {
+    res.status(500).send("Error adding client");
+  }
 });
 
-app.listen(3000, () => {
-  console.log('Server running');
+// تشغيل السيرفر
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log("Server running on port " + PORT);
 });
