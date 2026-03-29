@@ -5,9 +5,7 @@ const app = express();
 app.use(express.json());
 
 // 🔗 حط هنا الرابط بتاعك
-const uri = "mongodb+srv://galaxymaneg_db_user:<5tLXk3DR8VHrH2RL
->@mega.s42tt5h.mongodb.net/?appName=mega";
-
+const uri = "mongodb+srv://galaxymaneg_db_user:5tLXk3DR8VHrH2RL@mega.s42tt5h.mongodb.net/?retryWrites=true&w=majority";
 const client = new MongoClient(uri);
 
 let db;
