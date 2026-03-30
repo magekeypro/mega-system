@@ -1,25 +1,63 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>MEGA System</title>
-<style>
-body {background:#0b1220;color:#fff;font-family:Arial;text-align:center;padding:40px}
-.card {background:#1e293b;padding:20px;border-radius:10px;margin:10px auto;width:300px}
-input,button {margin:5px;padding:10px;width:90%}
-button {background:#7c3aed;color:#fff;border:none}
-</style>
+  <title>Mega System</title>
 </head>
 <body>
-<h1>MEGA System</h1>
-<div class="card">
-<h3>إضافة عميل</h3>
-<input id="name" placeholder="الاسم">
-<input id="phone" placeholder="الموبايل">
-<button onclick="add()">إضافة</button>
-</div>
-<script>
-function add(){ alert("تمت الإضافة (نسخة Demo)"); }
-</script>
+
+  <h1>Clients</h1>
+
+  <input id="name" placeholder="Name">
+  <input id="phone" placeholder="Phone">
+  <button onclick="addClient()">Add Client</button>
+
+  <ul id="list"></ul>
+
+  <script>
+    const API = "https://mega-system.onrender.com";
+
+    async function getClients() {
+      const res = await fetch(API + "/clients");
+      const data = await res.json();
+
+      const list = document.getElementById("list");
+      list.innerHTML = "";
+
+      data.forEach(client => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          ${client.name} - ${client.phone}
+          <button onclick="deleteClient('${client._id}')">Delete</button>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    async function addClient() {
+      const name = document.getElementById("name").value;
+      const phone = document.getElementById("phone").value;
+
+      await fetch(API + "/add-client", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name, phone, status: "active" })
+      });
+
+      getClients();
+    }
+
+    async function deleteClient(id) {
+      await fetch(API + "/delete-client/" + id, {
+        method: "DELETE"
+      });
+
+      getClients();
+    }
+
+    getClients();
+  </script>
+
 </body>
 </html>
