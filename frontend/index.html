@@ -1,63 +1,110 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar">
 <head>
-  <title>Mega System</title>
+<meta charset="UTF-8">
+<title>MEGA System</title>
+
+<style>
+body {
+    background:#0b1220;
+    color:#fff;
+    font-family:Arial;
+    text-align:center;
+    padding:40px;
+}
+
+.card {
+    background:#1e293b;
+    padding:20px;
+    border-radius:10px;
+    margin:20px auto;
+    width:350px;
+}
+
+input, button {
+    margin:5px;
+    padding:10px;
+    width:90%;
+}
+
+button {
+    background:#7c3aed;
+    color:#fff;
+    border:none;
+    cursor:pointer;
+}
+
+.client {
+    background:#334155;
+    margin:10px;
+    padding:10px;
+    border-radius:8px;
+}
+</style>
 </head>
+
 <body>
 
-  <h1>Clients</h1>
+<h1>Clients</h1>
 
-  <input id="name" placeholder="Name">
-  <input id="phone" placeholder="Phone">
-  <button onclick="addClient()">Add Client</button>
+<div class="card">
+    <input id="name" placeholder="Name">
+    <input id="phone" placeholder="Phone">
+    <button onclick="add()">Add Client</button>
+</div>
 
-  <ul id="list"></ul>
+<div id="list"></div>
 
-  <script>
-    const API = "https://mega-system.onrender.com";
+<script>
 
-    async function getClients() {
-      const res = await fetch(API + "/clients");
-      const data = await res.json();
+// 🔥 رابط السيرفر بتاعك
+const API = "https://mega-system.onrender.com";
 
-      const list = document.getElementById("list");
-      list.innerHTML = "";
+// ✅ إضافة عميل
+async function add() {
+    const name = document.getElementById("name").value;
+    const phone = document.getElementById("phone").value;
 
-      data.forEach(client => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-          ${client.name} - ${client.phone}
-          <button onclick="deleteClient('${client._id}')">Delete</button>
-        `;
-        list.appendChild(li);
-      });
+    if (!name || !phone) {
+        alert("اكتب البيانات الأول");
+        return;
     }
 
-    async function addClient() {
-      const name = document.getElementById("name").value;
-      const phone = document.getElementById("phone").value;
-
-      await fetch(API + "/add-client", {
+    await fetch(API + "/add-client", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ name, phone, status: "active" })
-      });
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            name,
+            phone,
+            status: "active"
+        })
+    });
 
-      getClients();
-    }
+    load();
+}
 
-    async function deleteClient(id) {
-      await fetch(API + "/delete-client/" + id, {
-        method: "DELETE"
-      });
+// ✅ تحميل العملاء
+async function load() {
+    const res = await fetch(API + "/clients");
+    const data = await res.json();
 
-      getClients();
-    }
+    const list = document.getElementById("list");
+    list.innerHTML = "";
 
-    getClients();
-  </script>
+    data.forEach(c => {
+        list.innerHTML += `
+            <div class="client">
+                <h3>${c.name}</h3>
+                <p>${c.phone}</p>
+            </div>
+        `;
+    });
+}
+
+// أول ما الصفحة تفتح
+load();
+
+</script>
 
 </body>
 </html>
