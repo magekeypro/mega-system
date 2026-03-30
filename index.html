@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mega System</title>
+</head>
+<body>
+
+  <h1>Clients</h1>
+
+  <input id="name" placeholder="Name">
+  <input id="phone" placeholder="Phone">
+  <button onclick="addClient()">Add Client</button>
+
+  <ul id="list"></ul>
+
+  <script>
+    const API = "https://mega-system.onrender.com";
+
+    async function getClients() {
+      const res = await fetch(API + "/clients");
+      const data = await res.json();
+
+      const list = document.getElementById("list");
+      list.innerHTML = "";
+
+      data.forEach(client => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          ${client.name} - ${client.phone}
+          <button onclick="deleteClient('${client._id}')">Delete</button>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    async function addClient() {
+      const name = document.getElementById("name").value;
+      const phone = document.getElementById("phone").value;
+
+      await fetch(API + "/add-client", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name, phone, status: "active" })
+      });
+
+      getClients();
+    }
+
+    async function deleteClient(id) {
+      await fetch(API + "/delete-client/" + id, {
+        method: "DELETE"
+      });
+
+      getClients();
+    }
+
+    getClients();
+  </script>
+
+</body>
+</html>
